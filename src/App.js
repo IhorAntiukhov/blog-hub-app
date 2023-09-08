@@ -1,23 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { setCurrentPath } from './store';
+import Sidebar from './components/Sidebar';
 
 function App() {
+  const dispatch = useDispatch();
+
+  const currentPath = useSelector((state) => state.navigationReducer.currentPath);
+
+  useEffect(() => {
+    if (window.location.pathname !== currentPath) {
+      dispatch(setCurrentPath(window.location.pathname));
+    }
+  }, [dispatch, currentPath]);
+
+  useEffect(() => {
+    const handler = () => {
+      dispatch(setCurrentPath(window.location.pathname));
+    };
+    window.addEventListener('popstate', handler);
+
+    return () => {
+      window.removeEventListener('popstate', handler);
+    }
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="flex h-screen bg-neutral-1">
+      <Sidebar />
+      <main className="grow">
+
+      </main>
     </div>
   );
 }
