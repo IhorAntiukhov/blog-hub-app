@@ -2,6 +2,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { setCurrentPath } from './store';
 import Sidebar from './components/Sidebar';
+import Route from './components/Route';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
   const dispatch = useDispatch();
@@ -29,7 +31,18 @@ function App() {
     <div className="flex h-screen bg-neutral-1">
       <Sidebar />
       <main className="grow">
+        <Route path="/">
+        </Route>
 
+        <Route path="/subscriptions">
+        </Route>
+
+        <Route path="/marked">
+        </Route>
+
+        <Route path="/profile">
+          <UserProfilePage />
+        </Route>
       </main>
     </div>
   );

@@ -5,7 +5,7 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      "sans": ['"Work Sans"']
+      "sans": ['"Work Sans"', 'sans-serif']
     },
     colors: {
       primary: "#016A70",
