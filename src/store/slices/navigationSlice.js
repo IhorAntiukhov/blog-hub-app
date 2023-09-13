@@ -4,7 +4,8 @@ const navigationSlice = createSlice({
   name: 'navigation',
   initialState: {
     currentPath: '/',
-    signInOrSignUp: 'signIn'
+    signInOrSignUp: 'signIn',
+    notifications: []
   },
   reducers: {
     setCurrentPath(state, action) {
@@ -12,6 +13,15 @@ const navigationSlice = createSlice({
     },
     setSignInOrSignUp(state, action) {
       state.signInOrSignUp = action.payload;
+    },
+
+    showNotification(state, action) {
+      state.notifications.push(action.payload);
+    },
+    hideNotification(state, action) {
+      state.notifications = state.notifications.filter((notification) => (
+        notification.id !== action.payload
+      ));
     }
   }
 });
@@ -19,5 +29,7 @@ const navigationSlice = createSlice({
 export const navigationReducer = navigationSlice.reducer;
 export const {
   setCurrentPath,
-  setSignInOrSignUp
+  setSignInOrSignUp,
+  showNotification,
+  hideNotification
 } = navigationSlice.actions;

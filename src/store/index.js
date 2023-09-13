@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { navigationReducer, setCurrentPath, setSignInOrSignUp } from './slices/navigationSlice';
+import { navigationReducer, setCurrentPath, setSignInOrSignUp, showNotification, hideNotification } from './slices/navigationSlice';
 
 const store = configureStore({
   reducer: {
@@ -7,4 +7,4 @@ const store = configureStore({
   }
 });
 
-export { store, setCurrentPath, setSignInOrSignUp };
+export { store, setCurrentPath, setSignInOrSignUp, showNotification, hideNotification };

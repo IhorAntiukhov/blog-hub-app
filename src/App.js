@@ -4,6 +4,7 @@ import { setCurrentPath } from './store';
 import Sidebar from './components/Sidebar';
 import Route from './components/Route';
 import UserProfilePage from './pages/UserProfilePage';
+import NotificationBar from './components/NotificationBar';
 
 function App() {
   const dispatch = useDispatch();
@@ -30,7 +31,9 @@ function App() {
   return (
     <div className="flex h-screen bg-neutral-1">
       <Sidebar />
-      <main className="grow">
+      <main className="relative grow">
+        <NotificationBar />
+
         <Route path="/">
         </Route>
 

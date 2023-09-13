@@ -5,7 +5,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup
 } from 'firebase/auth';
-import { setSignInOrSignUp } from '../store';
+import { setSignInOrSignUp, showNotification } from '../store';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock } from 'react-icons/md';
 import { auth, googleProvider } from '../firebase-config';
@@ -13,6 +13,7 @@ import ReactIcon from './ReactIcon';
 import Input from './Input';
 import Button from './Button';
 import google from '../svg/google.svg';
+import { nanoid } from '@reduxjs/toolkit';
 
 function SignIn() {
   const [userEmail, setUserEmail] = useState('');
@@ -21,21 +22,58 @@ function SignIn() {
   const dispatch = useDispatch();
 
   const resetPassword = async () => {
+    if (!userEmail) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Enter your email'
+      }));
+
+      return;
+    }
+
     try {
       await sendPasswordResetEmail(auth, userEmail);
-    } catch (error) { }
+      dispatch(showNotification({
+        id: nanoid(), type: 'Info', text: `Reset email sent to ${userEmail}`
+      }));
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to send email'
+      }));
+    }
   }
 
   const signInWithEmail = async () => {
+    if (!userEmail || !userPassword) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Fill in all the fields'
+      }));
+
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, userEmail, userPassword);
-    } catch (error) { }
+      dispatch(showNotification({
+        id: nanoid(), type: 'Info', text: 'Logged in successfully'
+      }));
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to login to user'
+      }));
+    }
   }
 
   const signInWithGoogle = async () => {
     try {
-      signInWithPopup(auth, googleProvider);
-    } catch (error) { }
+      await signInWithPopup(auth, googleProvider);
+      dispatch(showNotification({
+        id: nanoid(), type: 'Info', text: 'Successfully logged in using Google'
+      }));
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to login to user'
+      }));
+    }
   }
 
   return (

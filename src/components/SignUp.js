@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { nanoid } from '@reduxjs/toolkit';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock } from 'react-icons/md';
-import { setSignInOrSignUp } from '../store';
+import { setSignInOrSignUp, showNotification } from '../store';
 import { auth } from '../firebase-config';
 import ReactIcon from './ReactIcon';
 import Input from './Input';
@@ -18,9 +19,50 @@ function SignUp() {
   const dispatch = useDispatch();
 
   const signUp = async () => {
+    if (!userEmail || !userPassword || !confirmedUserPassword) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Fill in all the fields'
+      }));
+
+      return;
+    }
+
+    if (!userEmail.toLowerCase().match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    )) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Incorrect email format'
+      }));
+
+      return;
+    }
+
+    if (userPassword.length < 6) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'The password must be at least 6 characters long'
+      }));
+
+      return;
+    }
+
+    if (userPassword !== confirmedUserPassword) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Confirmed password does not match'
+      }));
+
+      return;
+    }
+
     try {
       await createUserWithEmailAndPassword(auth, userEmail, userPassword);
-    } catch (error) { }
+      dispatch(showNotification({
+        id: nanoid(), type: 'Info', text: 'Successfully created a user'
+      }));
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to create user'
+      }));
+    }
   }
 
   return (
@@ -28,7 +70,7 @@ function SignUp() {
       <div className="flex flex-col items-center p-6 bg-[white] rounded-xl">
         <ReactIcon src={<BiSolidUserRectangle className="w-28 h-28 mb-4" />} color="" />
 
-        <div className="flex flex-col space-y-2 w-full mb-4">
+        <div className="w-full mb-4">
           <Input value={userEmail} onChange={(text) => { setUserEmail(text) }}
             type="text" placeholder="User email" icon={<MdEmail className="h-8 w-8" />} />
         </div>

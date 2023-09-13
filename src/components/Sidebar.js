@@ -15,8 +15,7 @@ function Sidebar() {
   }
 
   return (
-    <nav className=
-      "flex flex-col justify-center space-y-8 h-full border-r-[3px] border-neutral-3 bg-neutral-2">
+    <nav className="z-20 flex flex-col justify-center space-y-8 h-full border-r-[3px] border-neutral-3 bg-neutral-2">
       <SidebarLink href="/" title="Home" selected={currentPath === '/'}>
         <ReactIcon src={<BiSolidHome className="w-12 h-12" />} color={defineIconColor('/')} />
       </SidebarLink>
