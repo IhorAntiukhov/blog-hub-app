@@ -7,3 +7,12 @@
 #root {
   height: 100vh;
 }
+
+input[type="checkbox"]:checked + label::before {
+  padding: 5px;
+  background-image: url('./svg/check.svg');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+}

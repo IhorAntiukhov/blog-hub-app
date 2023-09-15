@@ -10,13 +10,14 @@ import {
   EmailAuthProvider
 } from 'firebase/auth';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { auth, googleProvider, storage } from '../firebase-config';
+import { auth, storage } from '../firebase-config';
 import { BiSolidUser } from 'react-icons/bi';
-import { MdEmail, MdLock } from 'react-icons/md';
+import { MdEmail, MdLock, MdLogout } from 'react-icons/md';
 import { showNotification } from '../store';
 import PhotoSelect from './PhotoSelect';
 import Input from './Input';
 import Button from './Button';
+import ReactIcon from './ReactIcon';
 
 function UserProfile() {
   const [userPhoto, setUserPhoto] = useState(
@@ -146,7 +147,7 @@ function UserProfile() {
   }
 
   return (
-    <div className="flex flex-col items-center space-y-4 h-full p-6 bg-[white] rounded-xl shadow-md">
+    <section className="flex flex-col items-center self-start space-y-4 p-6 bg-[white] rounded-xl shadow-lg">
       <PhotoSelect value={userPhoto} onChange={updateUserProfile} />
 
       <div className="flex flex-col space-y-2 w-full">
@@ -163,8 +164,11 @@ function UserProfile() {
           type="password" placeholder="New password" icon={<MdLock className="h-8 w-8" />} updateButton />
       </div>
 
-      <Button className="w-full" onClick={logout}>Logout</Button>
-    </div>
+      <Button className="w-full bg-secondary hover:bg-secondarySaturated" onClick={logout}>
+        <ReactIcon src={<MdLogout className="w-6 h-6" />} color="black" />
+        <span className="text-[black]">Logout</span>
+      </Button>
+    </section>
   );
 }
 

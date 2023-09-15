@@ -9,7 +9,7 @@ function NotificationBar() {
   ));
 
   return (
-    <div className="absolute top-4 left-4 flex flex-col space-y-2">
+    <div className="absolute bottom-4 left-4 flex flex-col space-y-2">
       {content}
     </div>
   );

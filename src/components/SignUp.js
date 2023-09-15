@@ -4,6 +4,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock } from 'react-icons/md';
+import { HiUserAdd } from 'react-icons/hi';
 import { setSignInOrSignUp, showNotification } from '../store';
 import { auth } from '../firebase-config';
 import ReactIcon from './ReactIcon';
@@ -67,7 +68,7 @@ function SignUp() {
 
   return (
     <div className="h-full flex justify-center items-center">
-      <div className="flex flex-col items-center p-6 bg-[white] rounded-xl">
+      <section className="flex flex-col items-center p-6 bg-[white] rounded-xl shadow-lg">
         <ReactIcon src={<BiSolidUserRectangle className="w-28 h-28 mb-4" />} color="" />
 
         <div className="w-full mb-4">
@@ -82,11 +83,14 @@ function SignUp() {
             type="password" placeholder="Confirm password" icon={<MdLock className="h-8 w-8" />} />
         </div>
 
-        <Button className="w-full mb-6" onClick={signUp}>Sign Up</Button>
+        <Button className="w-full mb-6" onClick={signUp}>
+          <ReactIcon src={<HiUserAdd className="w-6 h-6" />} color="white" />
+          <span>Sign Up</span>
+        </Button>
 
         <p>Already have an account? <span className="text-secondary cursor-pointer"
           onClick={() => { dispatch(setSignInOrSignUp('signIn')) }}>Sign in</span></p>
-      </div>
+      </section>
     </div>
   );
 }

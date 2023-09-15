@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 import { setSignInOrSignUp, showNotification } from '../store';
 import { BiSolidUserRectangle } from 'react-icons/bi';
-import { MdEmail, MdLock } from 'react-icons/md';
+import { MdEmail, MdLock, MdLogin } from 'react-icons/md';
 import { auth, googleProvider } from '../firebase-config';
 import ReactIcon from './ReactIcon';
 import Input from './Input';
@@ -78,7 +78,7 @@ function SignIn() {
 
   return (
     <div className="h-full flex justify-center items-center">
-      <div className="flex flex-col items-center p-6 bg-[white] rounded-xl">
+      <section className="flex flex-col items-center p-6 bg-[white] rounded-xl shadow-lg">
         <ReactIcon src={<BiSolidUserRectangle className="w-28 h-28 mb-4" />} color="" />
 
         <div className="flex flex-col space-y-2 mb-4">
@@ -91,16 +91,20 @@ function SignIn() {
         </div>
 
         <div className="columns-2 w-full mb-6">
-          <Button className="w-full" onClick={signInWithEmail}>Sign In</Button>
-          <Button className="flex justify-center items-center w-full" onClick={signInWithGoogle}>
-            <img className="w-6 h-6 mr-2" src={google} alt="" />
-            Google
+          <Button className="w-full" onClick={signInWithEmail}>
+            <ReactIcon src={<MdLogin className="h-6 w-6" />} color="white" />
+            <span>Sign In</span>
+          </Button>
+
+          <Button className="w-full" onClick={signInWithGoogle}>
+            <img className="w-6 h-6" src={google} alt="" />
+            <span>Google</span>
           </Button>
         </div>
 
         <p>Don't have an account yet? <span className="text-secondary cursor-pointer"
           onClick={() => { dispatch(setSignInOrSignUp('signUp')) }}>Sign up</span></p>
-      </div>
+      </section>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { BiSolidCameraPlus } from 'react-icons/bi';
 import ReactIcon from './ReactIcon';
 
 function PhotoSelect({ value, onChange }) {
-  const userPhotoClass = classNames('relative', { 'bg-secondary p-4': !value }, 'rounded-full', 'duration-150', 'hover:opacity-75');
+  const userPhotoClass = classNames('relative', { 'bg-secondary p-4': !value }, 'rounded-full', 'duration-150', 'transition-[opacity]', 'hover:opacity-75');
 
   let photo;
   if (typeof value !== 'string') {

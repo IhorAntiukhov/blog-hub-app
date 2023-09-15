@@ -5,6 +5,7 @@ import { auth } from '../firebase-config';
 import SignIn from '../components/SignIn';
 import SignUp from '../components/SignUp';
 import UserProfile from '../components/UserProfile';
+import UserPosts from '../components/UserPosts';
 
 function UserProfilePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -22,8 +23,9 @@ function UserProfilePage() {
       {(!isLoggedIn && signInOrSignUp === 'signIn') && <SignIn />}
       {(!isLoggedIn && signInOrSignUp === 'signUp') && <SignUp />}
       {isLoggedIn && (
-        <div className="flex p-6 h-full">
+        <div className="flex items-stretch space-x-6 h-full p-6">
           <UserProfile />
+          <UserPosts />
         </div>
       )}
     </>
