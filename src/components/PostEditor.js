@@ -1,47 +1,74 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
-import { addDoc, collection } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { MdPreview, MdClear, MdArrowBack, MdPublish } from 'react-icons/md';
-import { showNotification } from '../store';
-import { db, storage, auth } from '../firebase-config';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { MdPreview, MdClear, MdArrowBack, MdPublish, MdSave } from 'react-icons/md';
+import { setAddEditPostMode, showNotification } from '../store';
+import { db, auth } from '../firebase-config';
 import MarkdownPreviewRef from '@uiw/react-markdown-preview';
 import Button from './Button';
 import Input from './Input';
 import ReactIcon from './ReactIcon';
 
-function PostEditor({ topics }) {
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
+function PostEditor({ topics, onUpdate }) {
+  const editablePostData = useSelector((state) => state.postsReducer.editablePostData);
+
+  const [postTitle, setPostTitle] = useState(editablePostData?.header || '');
+  const [postContent, setPostContent] = useState(editablePostData?.content || '');
   const [previewMode, setPreviewMode] = useState(false);
 
   const dispatch = useDispatch();
 
   const publishPost = async () => {
-    try {
-      const userRef = ref(ref(storage), auth.currentUser.uid);
-      const postContentRef = ref(userRef, (new Date()).getTime() + '.txt');
-      const postContentFile = new Blob([postContent], { type: 'text/plain' });
-
-      await uploadBytes(postContentRef, postContentFile);
-      const downloadURL = await getDownloadURL(postContentRef);
-
-      await addDoc(collection(db, auth.currentUser.uid), {
-        header: postTitle,
-        contentURL: downloadURL,
-        topics: topics.join(' '),
-        publishDate: new Date(),
-        editDate: ''
-      });
-
+    if (topics.length === 0) {
       dispatch(showNotification({
-        id: nanoid(), type: 'Info', text: 'Post successfully published'
+        id: nanoid(), type: 'Error', text: 'Select at least one topic'
       }));
-    } catch (error) {
-      dispatch(showNotification({
-        id: nanoid(), type: 'Error', text: 'Failed to publish post'
-      }));
+
+      return;
+    }
+
+    if (editablePostData) {
+      try {
+        await updateDoc(doc(db, auth.currentUser.uid, editablePostData.id), {
+          header: postTitle,
+          content: postContent,
+          topics,
+          editDate: new Date()
+        });
+
+        dispatch(showNotification({
+          id: nanoid(), type: 'Info', text: 'Post successfully updated'
+        }));
+        dispatch(setAddEditPostMode({
+          addEditPostMode: 0
+        }));
+        onUpdate();
+      } catch (error) {
+        dispatch(showNotification({
+          id: nanoid(), type: 'Error', text: 'Failed to update post'
+        }));
+      }
+    } else {
+      try {
+        await addDoc(collection(db, auth.currentUser.uid), {
+          header: postTitle,
+          content: postContent,
+          topics,
+          reactions: [],
+          publishDate: new Date(),
+          editDate: ''
+        });
+
+        dispatch(showNotification({
+          id: nanoid(), type: 'Info', text: 'Post successfully published'
+        }));
+        onUpdate();
+      } catch (error) {
+        dispatch(showNotification({
+          id: nanoid(), type: 'Error', text: 'Failed to publish post'
+        }));
+      }
     }
   }
 
@@ -81,8 +108,10 @@ function PostEditor({ topics }) {
 
         {(previewMode) ?
           <Button onClick={publishPost}>
-            <ReactIcon src={<MdPublish className="w-6 h-6" />} color="white" />
-            <span>Publish post</span>
+            {(editablePostData) ?
+              <ReactIcon src={<MdSave className="w-6 h-6" />} color="white" /> :
+              <ReactIcon src={<MdPublish className="w-6 h-6" />} color="white" />}
+            <span>{(editablePostData) ? 'Save changes' : 'Publish post'}</span>
           </Button> :
           <Button onClick={() => { setPostContent('') }} error>
             <ReactIcon src={<MdClear className="w-6 h-6" />} color="white" />

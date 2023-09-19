@@ -5,7 +5,7 @@ const navigationSlice = createSlice({
   initialState: {
     currentPath: '/',
     signInOrSignUp: 'signIn',
-    notifications: []
+    notifications: [],
   },
   reducers: {
     setCurrentPath(state, action) {

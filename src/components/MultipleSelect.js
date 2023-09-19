@@ -44,7 +44,7 @@ function MultipleSelect({ value, onChange, title, options }) {
     'origin-top', { 'animate-open-dropdown': isOpen === 2, 'animate-close-dropdown': isOpen === 1, 'hidden': isOpen === 0 });
 
   const renderedOptions = options.map((option) => (
-    <div className="px-4 py-2.5 border-b-[3px] border-b-neutral-2 last:border-b-0">
+    <div key={option} className="px-4 py-2.5 border-b-[3px] border-b-neutral-2 last:border-b-0">
       <input className="absolute -z-10 w-[0.1px] h-[0.1px] opacity-0"
         type="checkbox" id={option} checked={value.indexOf(option) !== -1} onChange={(event) => { changeSelectedOptions(event, option) }} />
       <label className={checkboxClass} htmlFor={option}>{option}</label>

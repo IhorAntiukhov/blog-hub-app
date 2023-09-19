@@ -29,7 +29,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className="flex h-screen bg-neutral-1">
+    <div className="flex h-screen overflow-hidden bg-neutral-1">
       <Sidebar />
       <main className="relative grow">
         <NotificationBar />

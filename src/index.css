@@ -16,3 +16,16 @@ input[type="checkbox"]:checked + label::before {
   background-repeat: no-repeat;
   background-origin: content-box;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d9d9c3;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #bfbfac;
+}
