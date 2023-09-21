@@ -4,14 +4,14 @@ import { nanoid } from '@reduxjs/toolkit';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { MdPreview, MdClear, MdArrowBack, MdPublish, MdSave } from 'react-icons/md';
 import { setAddEditPostMode, showNotification } from '../store';
-import { db, auth } from '../firebase-config';
+import { auth, db } from '../firebase-config';
 import MarkdownPreviewRef from '@uiw/react-markdown-preview';
 import Button from './Button';
 import Input from './Input';
 import ReactIcon from './ReactIcon';
 
 function PostEditor({ topics, onUpdate }) {
-  const editablePostData = useSelector((state) => state.postsReducer.editablePostData);
+  const editablePostData = useSelector((state) => state.userPostsReducer.editablePostData);
 
   const [postTitle, setPostTitle] = useState(editablePostData?.header || '');
   const [postContent, setPostContent] = useState(editablePostData?.content || '');
@@ -30,7 +30,7 @@ function PostEditor({ topics, onUpdate }) {
 
     if (editablePostData) {
       try {
-        await updateDoc(doc(db, auth.currentUser.uid, editablePostData.id), {
+        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', editablePostData.id), {
           header: postTitle,
           content: postContent,
           topics,
@@ -51,7 +51,8 @@ function PostEditor({ topics, onUpdate }) {
       }
     } else {
       try {
-        await addDoc(collection(db, auth.currentUser.uid), {
+        await addDoc(collection(db, 'users', auth.currentUser.uid, 'posts'), {
+          uid: auth.currentUser.uid,
           header: postTitle,
           content: postContent,
           topics,

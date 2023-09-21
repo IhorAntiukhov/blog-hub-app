@@ -19,6 +19,10 @@ module.exports = {
         3: '#e6e6cf',
         4: '#808077'
       },
+      neutralSaturated: {
+        1: '#f0f0d8',
+        2: '#a0a093',
+      },
       info: '#127be3',
       error: '#e32e12',
       errorSaturated: '#ea634e'

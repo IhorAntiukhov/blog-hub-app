@@ -1,36 +1,47 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { nanoid } from '@reduxjs/toolkit';
 import { getDocs, collection } from 'firebase/firestore';
 import { MdAdd, MdArrowBack } from 'react-icons/md';
 import classNames from 'classnames';
-import { setAllPosts, setAddEditPostMode } from '../store';
-import { db, auth } from '../firebase-config';
+import { setUserPosts, setAddEditPostMode, showNotification } from '../store';
+import { auth, db } from '../firebase-config';
 import Button from './Button';
 import ReactIcon from './ReactIcon';
 import SortCriteria from './SortCriteria';
 import MultipleSelect from './MultipleSelect';
 import PostEditor from './PostEditor';
 import Post from './Post';
+import TOPICS_LIST from '..';
+import useSortPosts from '../hooks/use-sort-posts';
 
 function UserPosts() {
-  const { allPosts, reactions, addEditPostMode, sortCriteria, sortOrder } = useSelector((state) => state.postsReducer);
+  const { userPosts, reactions, addEditPostMode } = useSelector((state) => state.userPostsReducer);
   const dispatch = useDispatch();
 
-  const [filteredTopics, setFilteredTopics] = useState(['Entertaiment', 'Science', 'Games']);
+  const [filteringTopics, setFilteringTopics] = useState(TOPICS_LIST);
   const [blogTopics, setBlogTopics] = useState([]);
 
   const getAllPosts = useCallback(async () => {
-    const querySnapshot = await getDocs(collection(db, auth.currentUser.uid));
+    try {
+      const querySnapshot = await getDocs(collection(db, 'users', auth.currentUser.uid, 'posts'));
 
-    const postsData = [];
-    querySnapshot.forEach((doc) => {
-      postsData.push({
-        ...doc.data(), id: doc.id,
-        publishDate: doc.data().publishDate.toDate(),
-        editDate: (doc.data().editDate !== '') ? doc.data().editDate.toDate() : ''
+      const postsData = [];
+      querySnapshot.forEach((doc) => {
+        if (doc.id !== 'userData') {
+          postsData.push({
+            ...doc.data(), id: doc.id,
+            publishDate: doc.data().publishDate.toDate(),
+            editDate: (doc.data().editDate !== '') ? doc.data().editDate.toDate() : ''
+          });
+        }
       });
-    });
-    dispatch(setAllPosts(postsData));
+      dispatch(setUserPosts(postsData));
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'An error occurred while trying to retrieve posts'
+      }));
+    }
   }, [dispatch]);
 
   useEffect(() => {
@@ -43,36 +54,18 @@ function UserPosts() {
     }));
   }
 
-  const sortedPosts = allPosts.filter((post) => {
-    return !!post.topics.reduce(((accumulator, topic) => accumulator += (filteredTopics.includes(topic)) ? 1 : 0), 0);
-  });
-
-  if (sortCriteria === 'Reactions' && sortOrder === 1) {
-    sortedPosts.sort((a, b) => a.reactions.length - b.reactions.length);
-  }
-  else if (sortCriteria === 'Reactions' && sortOrder === 2) {
-    sortedPosts.sort((a, b) => b.reactions.length - a.reactions.length);
-  }
-  else if (sortCriteria === 'Publish date' && sortOrder === 1) {
-    sortedPosts.sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
-  }
-  else if (sortCriteria === 'Publish date' && sortOrder === 2) {
-    sortedPosts.sort((a, b) => a.publishDate.getTime() - b.publishDate.getTime());
-  }
-  else {
-    sortedPosts.sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
-  }
+  const sortedPosts = useSortPosts(filteringTopics, 'userPosts');
 
   let content;
-  if (allPosts.length === 0) {
+  if (userPosts.length === 0) {
     content = <p className="text-2xl text-neutral-4">You haven't published any posts</p>;
-  } else if (allPosts.length > 0 && sortedPosts.length === 0) {
+  } else if (userPosts.length > 0 && sortedPosts.length === 0) {
     content = <p className="text-2xl text-neutral-4">There are no posts on established topics</p>;
   } else {
     content = sortedPosts.map((post) =>
     (<Post key={post.id} post={post} onUpdate={getAllPosts} onEdit={(topics) => {
       setBlogTopics(topics);
-    }} />
+    }} editButtons />
     ));
   }
 
@@ -95,9 +88,9 @@ function UserPosts() {
         </div>}
 
         {(addEditPostMode) ? <MultipleSelect value={blogTopics} onChange={(value) => { setBlogTopics(value) }}
-          title="Topics" options={['Entertaiment', 'Science', 'Games']} /> :
-          <MultipleSelect value={filteredTopics} onChange={(value) => { setFilteredTopics(value) }}
-            title="Topics" options={['Entertaiment', 'Science', 'Games']} />}
+          title="Topics" options={TOPICS_LIST} /> :
+          <MultipleSelect value={filteringTopics} onChange={(value) => { setFilteringTopics(value) }}
+            title="Topics" options={TOPICS_LIST} />}
       </header>
 
       {!addEditPostMode && <div className={allPostsClass}>
@@ -107,7 +100,7 @@ function UserPosts() {
       {!!addEditPostMode && <PostEditor topics={blogTopics} onUpdate={getAllPosts} />}
 
       {!addEditPostMode && <footer className="flex justify-around items-center w-full p-4">
-        <p className="text-neutral-4">Number of posts: {allPosts.length}</p>
+        <p className="text-neutral-4">Number of posts: {userPosts.length}</p>
         <p className="text-neutral-4">Number of reactions: {reactions}</p>
       </footer>}
     </section>

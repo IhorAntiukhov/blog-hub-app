@@ -5,10 +5,11 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup
 } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
 import { setSignInOrSignUp, showNotification } from '../store';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock, MdLogin } from 'react-icons/md';
-import { auth, googleProvider } from '../firebase-config';
+import { db, auth, googleProvider } from '../firebase-config';
 import ReactIcon from './ReactIcon';
 import Input from './Input';
 import Button from './Button';
@@ -42,6 +43,20 @@ function SignIn() {
     }
   }
 
+  const setUserData = async () => {
+    try {
+      await setDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
+        uid: auth.currentUser.uid,
+        photoURL: auth.currentUser.photoURL || '',
+        name: auth.currentUser.displayName || ''
+      });
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to set user data. Try to sign in again.'
+      }));
+    }
+  }
+
   const signInWithEmail = async () => {
     if (!userEmail || !userPassword) {
       dispatch(showNotification({
@@ -53,6 +68,8 @@ function SignIn() {
 
     try {
       await signInWithEmailAndPassword(auth, userEmail, userPassword);
+      await setUserData();
+
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'Logged in successfully'
       }));
@@ -66,6 +83,8 @@ function SignIn() {
   const signInWithGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
+      await setUserData();
+
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'Successfully logged in using Google'
       }));

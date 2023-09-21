@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import Route from './components/Route';
 import UserProfilePage from './pages/UserProfilePage';
 import NotificationBar from './components/NotificationBar';
+import HomePage from './pages/HomePage';
 
 function App() {
   const dispatch = useDispatch();
@@ -35,6 +36,7 @@ function App() {
         <NotificationBar />
 
         <Route path="/">
+          <HomePage />
         </Route>
 
         <Route path="/subscriptions">

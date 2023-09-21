@@ -2,8 +2,10 @@ import './index.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import App from './App';
 import { store } from './store';
+import App from './App';
+
+const TOPICS_LIST = ['IT', 'Education', 'Gaming', 'Science', 'Sports', 'Travel']
 
 const el = document.querySelector('#root');
 const root = createRoot(el);
@@ -15,3 +17,5 @@ root.render(
     </Provider>
   </React.StrictMode>
 );
+
+export default TOPICS_LIST;

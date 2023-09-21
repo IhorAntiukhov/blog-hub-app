@@ -4,7 +4,7 @@ import { setSort } from '../store';
 import ReactIcon from './ReactIcon';
 
 function SortCriteria({ title }) {
-  const { sortCriteria, sortOrder } = useSelector((state) => state.postsReducer);
+  const { sortCriteria, sortOrder } = useSelector((state) => state.userPostsReducer);
   const dispatch = useDispatch();
 
   const setAscendingOrder = () => {

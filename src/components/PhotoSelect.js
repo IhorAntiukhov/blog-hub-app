@@ -34,7 +34,7 @@ function PhotoSelect({ value, onChange }) {
       </div>
       {
         (value && photo) ?
-          <p className="cursor-pointer" onClick={() => { onChange(null) }}>Reset user photo</p> :
+          <p className="cursor-pointer" onClick={() => { onChange(null, true) }}>Reset user photo</p> :
           <p>Select user photo</p>
       }
     </div>

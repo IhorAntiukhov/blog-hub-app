@@ -10,7 +10,7 @@ import {
   EmailAuthProvider
 } from 'firebase/auth';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { auth, storage } from '../firebase-config';
+import { auth, db, storage } from '../firebase-config';
 import { BiSolidUser } from 'react-icons/bi';
 import { MdEmail, MdLock, MdLogout } from 'react-icons/md';
 import { showNotification } from '../store';
@@ -18,6 +18,7 @@ import PhotoSelect from './PhotoSelect';
 import Input from './Input';
 import Button from './Button';
 import ReactIcon from './ReactIcon';
+import { doc, updateDoc } from 'firebase/firestore';
 
 function UserProfile() {
   const [userPhoto, setUserPhoto] = useState(
@@ -32,7 +33,7 @@ function UserProfile() {
 
   const dispatch = useDispatch();
 
-  const updateUserProfile = async (photo) => {
+  const updateUserProfile = async (photo, resetPhoto) => {
     if (!userName) {
       dispatch(showNotification({
         id: nanoid(), type: 'Error', text: 'Enter user name'
@@ -52,13 +53,31 @@ function UserProfile() {
         await updateProfile(auth.currentUser, {
           displayName: userName, photoURL: downloadURL
         });
+
+        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
+          photoURL: downloadURL,
+          name: userName
+        });
+        setUserPhoto(photo);
+      } else if (resetPhoto) {
+        await updateProfile(auth.currentUser, {
+          displayName: userName, photoURL: ''
+        });
+
+        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
+          photoURL: '',
+          name: userName
+        });
+        setUserPhoto(photo);
       } else {
         await updateProfile(auth.currentUser, {
-          displayName: userName, photoURL: ""
+          displayName: userName
+        });
+        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
+          name: userName
         });
       }
 
-      setUserPhoto(photo);
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'User profile updated'
       }));

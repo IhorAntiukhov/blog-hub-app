@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const postsSlice = createSlice({
-  name: 'posts',
+const userPostsSlice = createSlice({
+  name: 'userPosts',
   initialState: {
-    allPosts: [],
+    userPosts: [],
     reactions: 0,
     addEditPostMode: 0,
     editablePostData: null,
@@ -11,8 +11,8 @@ const postsSlice = createSlice({
     sortCriteria: null
   },
   reducers: {
-    setAllPosts(state, action) {
-      state.allPosts = [...action.payload];
+    setUserPosts(state, action) {
+      state.userPosts = [...action.payload];
       state.addEditPostMode = 0;
       state.reactions = action.payload.reduce((accumulator, value) => accumulator += value.reactions.length, 0);
     },
@@ -31,5 +31,5 @@ const postsSlice = createSlice({
   }
 });
 
-export const postsReducer = postsSlice.reducer;
-export const { setAllPosts, setAddEditPostMode, setSort } = postsSlice.actions;
+export const userPostsReducer = userPostsSlice.reducer;
+export const { setUserPosts, setAddEditPostMode, setSort } = userPostsSlice.actions;
