@@ -11,7 +11,7 @@ import UserInfoPage from './pages/UserInfoPage';
 function App() {
   const dispatch = useDispatch();
 
-  const currentPath = useSelector((state) => state.navigationReducer.currentPath);
+  const { currentPath, userData } = useSelector((state) => state.navigationReducer);
 
   useEffect(() => {
     if (window.location.pathname !== currentPath) {
@@ -29,6 +29,8 @@ function App() {
       window.removeEventListener('popstate', handler);
     }
   }, [dispatch]);
+
+  if (currentPath === '/user-info' && !userData) dispatch(setCurrentPath('/'));
 
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-1">

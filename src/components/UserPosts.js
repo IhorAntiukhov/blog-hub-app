@@ -27,6 +27,9 @@ function UserPosts({ ownPosts }) {
       const querySnapshot = await getDocs(collection(db, 'users', (ownPosts) ? auth.currentUser.uid : userData.uid, 'posts'));
 
       const postsData = [];
+      let subscribers = 0;
+      let subscriptions = 0;
+
       querySnapshot.forEach((doc) => {
         if (doc.id !== 'userData') {
           postsData.push({
@@ -34,9 +37,12 @@ function UserPosts({ ownPosts }) {
             publishDate: doc.data().publishDate.toDate(),
             editDate: (doc.data().editDate !== '') ? doc.data().editDate.toDate() : ''
           });
+        } else if (ownPosts) {
+          subscribers = doc.data().subscribers.length;
+          subscriptions = doc.data().subscriptions.length;
         }
       });
-      dispatch(setUserPosts(postsData));
+      dispatch(setUserPosts({ postsData, userData: { subscribers, subscriptions } }));
     } catch (error) {
       dispatch(showNotification({
         id: nanoid(), type: 'Error', text: 'An error occurred while trying to retrieve posts'

@@ -4,6 +4,8 @@ const userPostsSlice = createSlice({
   name: 'userPosts',
   initialState: {
     userPosts: [],
+    subscribers: 0,
+    subscriptions: 0,
     reactions: 0,
     addEditPostMode: 0,
     editablePostData: null,
@@ -12,9 +14,12 @@ const userPostsSlice = createSlice({
   },
   reducers: {
     setUserPosts(state, action) {
-      state.userPosts = [...action.payload];
+      state.userPosts = [...action.payload.postsData];
       state.addEditPostMode = 0;
-      state.reactions = action.payload.reduce((accumulator, value) => accumulator += value.reactions.length, 0);
+      state.reactions = action.payload.postsData.reduce((accumulator, value) => accumulator += value.reactions.length, 0);
+
+      state.subscribers = action.payload.userData.subscribers;
+      state.subscriptions = action.payload.userData.subscriptions;
     },
     setAddEditPostMode(state, action) {
       state.addEditPostMode = action.payload.addEditPostMode;
@@ -32,4 +37,6 @@ const userPostsSlice = createSlice({
 });
 
 export const userPostsReducer = userPostsSlice.reducer;
-export const { setUserPosts, setAddEditPostMode, setSort } = userPostsSlice.actions;
+export const {
+  setUserPosts, setAddEditPostMode, setSort
+} = userPostsSlice.actions;

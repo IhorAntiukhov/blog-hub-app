@@ -27,8 +27,11 @@ function TopPanel() {
 
   const filterByTopicsContent = TOPICS_LIST.map((option) => {
     const optionClass = classNames('px-4', 'py-1.5', 'text-lg',
-      { 'bg-neutral-3': !filteringTopics.includes(option), 'bg-neutral-4 text-[white]': filteringTopics.includes(option) },
-      'rounded-lg', 'cursor-pointer', 'duration-150', 'hover:bg-neutralSaturated');
+      {
+        'bg-neutral-3 hover:bg-neutralSaturated-1': !filteringTopics.includes(option),
+        'bg-neutral-4 text-[white] hover:bg-neutralSaturated-2': filteringTopics.includes(option)
+      },
+      'rounded-lg', 'cursor-pointer', 'duration-150');
 
     return <div key={option} className={optionClass}
       onClick={() => {

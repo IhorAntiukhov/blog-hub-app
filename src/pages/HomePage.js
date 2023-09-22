@@ -63,7 +63,7 @@ function HomePage() {
   }
 
   const postsClass = classNames({
-    'grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4': sortedPosts.length > 0,
+    'grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-4': sortedPosts.length > 0,
     'flex justify-center items-center h-full': sortedPosts.length === 0
   });
 

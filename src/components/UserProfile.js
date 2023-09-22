@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import {
   reauthenticateWithCredential,
@@ -21,12 +21,14 @@ import ReactIcon from './ReactIcon';
 import { doc, updateDoc } from 'firebase/firestore';
 
 function UserProfile() {
-  const [userPhoto, setUserPhoto] = useState(
-    (auth.currentUser.providerData[0].providerId !== 'google.com') ?
-      auth.currentUser.photoURL : auth.currentUser.providerData[0].photoURL);
+  const { subscribers, subscriptions } = useSelector((state) => state.userPostsReducer);
 
-  const [userName, setUserName] = useState(auth.currentUser.displayName || auth.currentUser.providerData[0].displayName);
-  const [userEmail, setUserEmail] = useState(auth.currentUser.email);
+  const [userPhoto, setUserPhoto] = useState(
+    (auth.currentUser?.providerData[0].providerId !== 'google.com' || auth.currentUser?.photoURL !== '') ?
+      auth.currentUser?.photoURL : auth.currentUser?.providerData[0].photoURL);
+
+  const [userName, setUserName] = useState(auth.currentUser?.displayName || auth.currentUser?.providerData[0].displayName);
+  const [userEmail, setUserEmail] = useState(auth.currentUser?.email);
 
   const [userPassword, setUserPassword] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
@@ -168,6 +170,11 @@ function UserProfile() {
   return (
     <section className="flex flex-col items-center self-start space-y-4 p-6 bg-[white] rounded-xl shadow-lg">
       <PhotoSelect value={userPhoto} onChange={updateUserProfile} />
+
+      <div className="flex space-x-2">
+        <p>{subscribers} subscribers</p>
+        <p>{subscriptions} subscriptions</p>
+      </div>
 
       <div className="flex flex-col space-y-2 w-full">
         <Input value={userName} onChange={(text) => { setUserName(text) }} onUpdate={updateUserProfile}

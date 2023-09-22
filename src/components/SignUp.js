@@ -5,8 +5,9 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock } from 'react-icons/md';
 import { HiUserAdd } from 'react-icons/hi';
+import { setDoc, doc } from 'firebase/firestore';
 import { setSignInOrSignUp, showNotification } from '../store';
-import { auth } from '../firebase-config';
+import { auth, db } from '../firebase-config';
 import ReactIcon from './ReactIcon';
 import Input from './Input';
 import Button from './Button';
@@ -18,6 +19,25 @@ function SignUp() {
   const [confirmedUserPassword, setConfirmedUserPassword] = useState('');
 
   const dispatch = useDispatch();
+
+  const setUserData = async () => {
+    try {
+      const creationTime = new Date(auth.currentUser.metadata.creationTime);
+
+      await setDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
+        uid: auth.currentUser.uid,
+        photoURL: '',
+        name: '',
+        creationTime,
+        subscribers: [],
+        subscriptions: [],
+      });
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to set user data. Try to sign in again.'
+      }));
+    }
+  }
 
   const signUp = async () => {
     if (!userEmail || !userPassword || !confirmedUserPassword) {
@@ -56,6 +76,8 @@ function SignUp() {
 
     try {
       await createUserWithEmailAndPassword(auth, userEmail, userPassword);
+      await setUserData();
+
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'Successfully created a user'
       }));

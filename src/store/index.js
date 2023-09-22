@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import {
-  navigationReducer, setCurrentPath, setSignInOrSignUp, openUserInfoPage, showNotification, hideNotification
+  navigationReducer, setCurrentPath, setSignInOrSignUp, openUserInfoPage, addSubscriber, removeSubscriber, showNotification, hideNotification
 } from './slices/navigationSlice';
 import {
   userPostsReducer, setUserPosts, setAddEditPostMode, setSort
@@ -18,7 +18,7 @@ const store = configureStore({
 });
 
 export {
-  store, setCurrentPath, setSignInOrSignUp, openUserInfoPage, showNotification, hideNotification,
+  store, setCurrentPath, setSignInOrSignUp, openUserInfoPage, addSubscriber, removeSubscriber, showNotification, hideNotification,
   setUserPosts, setAddEditPostMode, setSort,
   setAllPosts, setFilterByPopularity, addFilteringTopic, removeFilteringTopic
 };

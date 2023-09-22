@@ -16,10 +16,17 @@ const navigationSlice = createSlice({
     setSignInOrSignUp(state, action) {
       state.signInOrSignUp = action.payload;
     },
+
     openUserInfoPage(state, action) {
       window.history.pushState({}, '', '/user-info');
       state.currentPath = '/user-info';
       state.userData = action.payload;
+    },
+    addSubscriber(state, action) {
+      state.userData.subscribers.push(action.payload);
+    },
+    removeSubscriber(state, action) {
+      state.userData.subscribers = [...state.userData.subscribers.filter((subscriber) => subscriber !== action.payload)];
     },
 
     showNotification(state, action) {
@@ -38,6 +45,8 @@ export const {
   setCurrentPath,
   setSignInOrSignUp,
   openUserInfoPage,
+  addSubscriber,
+  removeSubscriber,
   showNotification,
   hideNotification
 } = navigationSlice.actions;

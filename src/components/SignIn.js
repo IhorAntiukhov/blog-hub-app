@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
+  getAdditionalUserInfo,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup
 } from 'firebase/auth';
-import { setDoc, doc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { setSignInOrSignUp, showNotification } from '../store';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock, MdLogin } from 'react-icons/md';
@@ -49,11 +50,11 @@ function SignIn() {
 
       await setDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
         uid: auth.currentUser.uid,
-        photoURL: auth.currentUser.photoURL || '',
-        name: auth.currentUser.displayName || '',
+        photoURL: auth.currentUser.providerData[0].photoURL || '',
+        name: auth.currentUser.providerData[0].displayName || '',
+        creationTime,
         subscribers: [],
         subscriptions: [],
-        creationTime
       });
     } catch (error) {
       dispatch(showNotification({
@@ -73,7 +74,6 @@ function SignIn() {
 
     try {
       await signInWithEmailAndPassword(auth, userEmail, userPassword);
-      await setUserData();
 
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'Logged in successfully'
@@ -87,8 +87,8 @@ function SignIn() {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      await setUserData();
+      const result = await signInWithPopup(auth, googleProvider);
+      if (getAdditionalUserInfo(result).isNewUser) await setUserData();
 
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'Successfully logged in using Google'
