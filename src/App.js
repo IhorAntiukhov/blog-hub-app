@@ -6,6 +6,7 @@ import Route from './components/Route';
 import UserProfilePage from './pages/UserProfilePage';
 import NotificationBar from './components/NotificationBar';
 import HomePage from './pages/HomePage';
+import UserInfoPage from './pages/UserInfoPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -47,6 +48,10 @@ function App() {
 
         <Route path="/profile">
           <UserProfilePage />
+        </Route>
+
+        <Route path="/user-info">
+          <UserInfoPage />
         </Route>
       </main>
     </div>

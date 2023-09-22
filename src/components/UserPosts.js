@@ -15,8 +15,8 @@ import Post from './Post';
 import TOPICS_LIST from '..';
 import useSortPosts from '../hooks/use-sort-posts';
 
-function UserPosts() {
-  const { userPosts, reactions, addEditPostMode } = useSelector((state) => state.userPostsReducer);
+function UserPosts({ ownPosts }) {
+  const { userPosts, reactions, addEditPostMode, userData } = useSelector((state) => ({ ...state.userPostsReducer, ...state.navigationReducer }));
   const dispatch = useDispatch();
 
   const [filteringTopics, setFilteringTopics] = useState(TOPICS_LIST);
@@ -24,7 +24,7 @@ function UserPosts() {
 
   const getAllPosts = useCallback(async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'users', auth.currentUser.uid, 'posts'));
+      const querySnapshot = await getDocs(collection(db, 'users', (ownPosts) ? auth.currentUser.uid : userData.uid, 'posts'));
 
       const postsData = [];
       querySnapshot.forEach((doc) => {
@@ -42,7 +42,7 @@ function UserPosts() {
         id: nanoid(), type: 'Error', text: 'An error occurred while trying to retrieve posts'
       }));
     }
-  }, [dispatch]);
+  }, [dispatch, ownPosts, userData]);
 
   useEffect(() => {
     getAllPosts();
@@ -58,14 +58,16 @@ function UserPosts() {
 
   let content;
   if (userPosts.length === 0) {
-    content = <p className="text-2xl text-neutral-4">You haven't published any posts</p>;
+    content = <p className="text-2xl text-neutral-4">
+      {(ownPosts) ? 'You haven\'t published any posts' : 'The user hasn\'t published any posts'}
+    </p>;
   } else if (userPosts.length > 0 && sortedPosts.length === 0) {
     content = <p className="text-2xl text-neutral-4">There are no posts on established topics</p>;
   } else {
     content = sortedPosts.map((post) =>
     (<Post key={post.id} post={post} onUpdate={getAllPosts} onEdit={(topics) => {
       setBlogTopics(topics);
-    }} editButtons />
+    }} editButtons={ownPosts} />
     ));
   }
 
@@ -75,12 +77,12 @@ function UserPosts() {
   return (
     <section className="flex flex-col items-center grow bg-[white] rounded-xl shadow-lg">
       <header className="flex justify-between items-center w-full p-6 border-b-2 border-neutral-3">
-        <Button onClick={handleSetPostMode}>
+        {ownPosts && <Button onClick={handleSetPostMode}>
           {(addEditPostMode) ?
             <ReactIcon src={<MdArrowBack className="w-6 h-6" />} color="white" /> :
             <ReactIcon src={<MdAdd className="w-6 h-6" />} color="white" />}
           <span>{(addEditPostMode) ? 'Back to posts' : 'Add new post'}</span>
-        </Button>
+        </Button>}
 
         {!addEditPostMode && <div className="flex space-x-4">
           <SortCriteria title="Reactions" onSort />

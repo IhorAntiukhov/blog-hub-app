@@ -4,7 +4,7 @@ import { MdEdit, MdDelete } from 'react-icons/md';
 import { FaHeart } from 'react-icons/fa';
 import { doc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { BiSolidUser } from 'react-icons/bi';
-import { setAddEditPostMode, showNotification } from '../store';
+import { openUserInfoPage, setAddEditPostMode, setCurrentPath, showNotification } from '../store';
 import { auth, db } from '../firebase-config';
 import MarkdownPreviewRef from '@uiw/react-markdown-preview';
 import ReactIcon from './ReactIcon';
@@ -49,6 +49,14 @@ function Post({ post, onUpdate, onEdit, showUserData, editButtons }) {
     }
   }
 
+  const openUserInfo = () => {
+    if (auth.currentUser.uid === post.uid) {
+      dispatch(setCurrentPath('/profile'));
+    } else {
+      dispatch(openUserInfoPage(post.userData));
+    }
+  }
+
   const formatDate = (date) => {
     const dateString = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
     const timeString = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -56,12 +64,12 @@ function Post({ post, onUpdate, onEdit, showUserData, editButtons }) {
     return `${timeString} ${dateString}`
   }
 
-  const topics = post.topics.map((topic) => <p className="px-4 py-1.5 text-lg bg-neutral-1 rounded-xl">{topic}</p>)
+  const topics = post.topics.map((topic) => <p className="px-4 py-1.5 text-lg bg-neutral-1 rounded-xl">{topic}</p>);
 
   return (
     <div className="flex flex-col space-y-2 p-4 bg-neutral-2 rounded-lg shadow-md">
       <div className="flex justify-between items-center">
-        {showUserData && <div className="flex items-center space-x-4">
+        {showUserData && <div className="flex items-center space-x-4 cursor-pointer" onClick={openUserInfo}>
           {
             (post.userData.photoURL) ?
               <img className="w-16 h-16 rounded-full object-cover" src={post.userData.photoURL} alt="User logo" /> :
@@ -85,7 +93,7 @@ function Post({ post, onUpdate, onEdit, showUserData, editButtons }) {
       <div className="flex justify-between items-end grow">
         <div className="flex items-center space-x-2">
           <ReactIcon src={<FaHeart className="w-6 h-6 cursor-pointer duration-150 hover:opacity-75 active:scale-125" onClick={addReaction} />}
-            color={(post.reactions.includes(auth.currentUser.uid) ? '#00A9BC' : '#016A70')} />
+            color={(post.reactions.includes(auth.currentUser?.uid) ? '#00A9BC' : '#73C67E')} />
           <p className="text-2xl">{post.reactions.length}</p>
         </div>
 

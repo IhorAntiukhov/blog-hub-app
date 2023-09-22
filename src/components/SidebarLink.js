@@ -7,8 +7,6 @@ function SidebarLink({ href, title, selected, children }) {
 
   const navigateToPage = (event) => {
     event.preventDefault();
-
-    window.history.pushState({}, '', href);
     dispatch(setCurrentPath(href));
   }
 

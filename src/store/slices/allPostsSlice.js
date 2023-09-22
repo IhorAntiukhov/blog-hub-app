@@ -26,4 +26,9 @@ const allPostsSlice = createSlice({
 });
 
 export const allPostsReducer = allPostsSlice.reducer;
-export const { setAllPosts, setFilterByPopularity, addFilteringTopic, removeFilteringTopic } = allPostsSlice.actions;
+export const {
+  setAllPosts,
+  setFilterByPopularity,
+  addFilteringTopic,
+  removeFilteringTopic
+} = allPostsSlice.actions;
