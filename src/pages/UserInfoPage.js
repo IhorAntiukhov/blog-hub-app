@@ -5,7 +5,7 @@ function UserInfoPage() {
   return (
     <div className="flex items-stretch space-x-6 h-full p-6">
       <UserInfo />
-      <UserPosts />
+      <UserPosts arrayName="userPosts" />
     </div>
   )
 }

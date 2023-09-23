@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux';
 
-function useSortPosts(userFilteringTopics, arrayToSort) {
-  const { userPosts, sortCriteria, sortOrder } = useSelector((state) => state.userPostsReducer);
-  const { allPosts, filterByPopularity, filteringTopics } = useSelector((state) => state.allPostsReducer);
+function useSortPosts(userFilteringTopics, arrayName) {
+  const {
+    userPosts, sortCriteria, sortOrder, allPosts, filterByPopularity, filteringTopics
+  } = useSelector((state) => ({ ...state.userPostsReducer, ...state.allPostsReducer }));
 
-  if (arrayToSort === 'userPosts') {
-    const sortedPosts = userPosts.filter((post) => {
+  if (arrayName !== 'allPosts') {
+    const sortedPosts = userPosts[arrayName].filter((post) => {
       return !!post.topics.reduce(((accumulator, topic) => accumulator += (userFilteringTopics.includes(topic)) ? 1 : 0), 0);
     });
 

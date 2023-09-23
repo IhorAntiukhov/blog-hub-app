@@ -4,7 +4,6 @@ const allPostsSlice = createSlice({
   name: 'allPosts',
   initialState: {
     allPosts: [],
-    userData: {},
     filterByPopularity: 'Recent',
     filteringTopics: []
   },

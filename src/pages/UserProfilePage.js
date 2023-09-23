@@ -25,7 +25,7 @@ function UserProfilePage() {
       {isLoggedIn && (
         <div className="flex items-stretch space-x-6 h-full p-6">
           <UserProfile />
-          <UserPosts ownPosts />
+          <UserPosts arrayName="ownPosts" />
         </div>
       )}
     </>

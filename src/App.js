@@ -7,6 +7,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import NotificationBar from './components/NotificationBar';
 import HomePage from './pages/HomePage';
 import UserInfoPage from './pages/UserInfoPage';
+import UserPosts from './components/UserPosts';
 
 function App() {
   const dispatch = useDispatch();
@@ -43,6 +44,9 @@ function App() {
         </Route>
 
         <Route path="/subscriptions">
+          <div className="flex flex-col h-full p-6">
+            <UserPosts arrayName="subscriptions" />
+          </div>
         </Route>
 
         <Route path="/marked">

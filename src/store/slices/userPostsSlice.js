@@ -3,7 +3,12 @@ import { createSlice } from '@reduxjs/toolkit';
 const userPostsSlice = createSlice({
   name: 'userPosts',
   initialState: {
-    userPosts: [],
+    userPosts: {
+      ownPosts: [],
+      userPosts: [],
+      subscriptions: [],
+      marked: []
+    },
     subscribers: 0,
     subscriptions: 0,
     reactions: 0,
@@ -14,7 +19,7 @@ const userPostsSlice = createSlice({
   },
   reducers: {
     setUserPosts(state, action) {
-      state.userPosts = [...action.payload.postsData];
+      state.userPosts[action.payload.arrayName] = [...action.payload.postsData];
       state.addEditPostMode = 0;
       state.reactions = action.payload.postsData.reduce((accumulator, value) => accumulator += value.reactions.length, 0);
 

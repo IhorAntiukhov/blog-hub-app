@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
-import { getDocs, collection } from 'firebase/firestore';
+import { getDocs, collection, query, collectionGroup, where } from 'firebase/firestore';
 import { MdAdd, MdArrowBack } from 'react-icons/md';
 import classNames from 'classnames';
 import { setUserPosts, setAddEditPostMode, showNotification } from '../store';
@@ -15,7 +15,7 @@ import Post from './Post';
 import TOPICS_LIST from '..';
 import useSortPosts from '../hooks/use-sort-posts';
 
-function UserPosts({ ownPosts }) {
+function UserPosts({ arrayName }) {
   const { userPosts, reactions, addEditPostMode, userData } = useSelector((state) => ({ ...state.userPostsReducer, ...state.navigationReducer }));
   const dispatch = useDispatch();
 
@@ -24,7 +24,23 @@ function UserPosts({ ownPosts }) {
 
   const getAllPosts = useCallback(async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'users', (ownPosts) ? auth.currentUser.uid : userData.uid, 'posts'));
+      let querySnapshot = [];
+      const usersData = {};
+
+      if (arrayName === 'subscriptions') {
+        const subscriptionsQuerySnapshot = await getDocs(query(collectionGroup(db, 'posts'), where('subscribers', 'array-contains', auth.currentUser.uid)));
+
+        if (!subscriptionsQuerySnapshot.empty) {
+          const subscribedUsers = [];
+          subscriptionsQuerySnapshot.forEach((doc) => {
+            usersData[doc.data().uid] = { ...doc.data() };
+            subscribedUsers.push((doc.data().uid));
+          });
+          querySnapshot = await getDocs(query(collectionGroup(db, 'posts'), where('uid', 'in', subscribedUsers)));
+        }
+      } else {
+        querySnapshot = await getDocs(collection(db, 'users', (arrayName === 'ownPosts') ? auth.currentUser.uid : userData.uid, 'posts'));
+      }
 
       const postsData = [];
       let subscribers = 0;
@@ -32,23 +48,25 @@ function UserPosts({ ownPosts }) {
 
       querySnapshot.forEach((doc) => {
         if (doc.id !== 'userData') {
+          const userData = usersData[doc.data().uid];
+
           postsData.push({
-            ...doc.data(), id: doc.id,
+            ...doc.data(), id: doc.id, userData,
             publishDate: doc.data().publishDate.toDate(),
             editDate: (doc.data().editDate !== '') ? doc.data().editDate.toDate() : ''
           });
-        } else if (ownPosts) {
+        } else if (arrayName === 'ownPosts') {
           subscribers = doc.data().subscribers.length;
           subscriptions = doc.data().subscriptions.length;
         }
       });
-      dispatch(setUserPosts({ postsData, userData: { subscribers, subscriptions } }));
+      dispatch(setUserPosts({ arrayName, postsData, userData: { subscribers, subscriptions } }));
     } catch (error) {
       dispatch(showNotification({
         id: nanoid(), type: 'Error', text: 'An error occurred while trying to retrieve posts'
       }));
     }
-  }, [dispatch, ownPosts, userData]);
+  }, [dispatch, userData, arrayName]);
 
   useEffect(() => {
     getAllPosts();
@@ -60,30 +78,36 @@ function UserPosts({ ownPosts }) {
     }));
   }
 
-  const sortedPosts = useSortPosts(filteringTopics, 'userPosts');
+  const sortedPosts = useSortPosts(filteringTopics, arrayName);
 
   let content;
-  if (userPosts.length === 0) {
+  if (userPosts[arrayName].length === 0) {
     content = <p className="text-2xl text-neutral-4">
-      {(ownPosts) ? 'You haven\'t published any posts' : 'The user hasn\'t published any posts'}
+      {(arrayName === 'ownPosts') ? 'You haven\'t published any posts' :
+        (arrayName === 'subscriptions') ? 'You haven\'t followed any user' : 'The user hasn\'t published any posts'}
     </p>;
-  } else if (userPosts.length > 0 && sortedPosts.length === 0) {
+  } else if (userPosts[arrayName].length > 0 && sortedPosts.length === 0) {
     content = <p className="text-2xl text-neutral-4">There are no posts on established topics</p>;
   } else {
     content = sortedPosts.map((post) =>
     (<Post key={post.id} post={post} onUpdate={getAllPosts} onEdit={(topics) => {
       setBlogTopics(topics);
-    }} editButtons={ownPosts} />
+    }} editButtons={arrayName === 'ownPosts'} showUserData={arrayName === 'subscriptions'} />
     ));
+
+    content = (arrayName === 'subscriptions') ?
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-4">{content}</div> :
+      content;
   }
 
-  const allPostsClass = classNames({ 'flex justify-center items-center': sortedPosts.length === 0 },
-    'grow', 'space-y-4', 'w-full', 'p-6', 'overflow-auto', '', 'border-b-2', 'border-neutral-3');
+  const postsClass = classNames(
+    { 'flex justify-center items-center': sortedPosts.length === 0 },
+    'grow', 'space-y-4', 'w-full', 'p-6', 'overflow-auto', 'border-b-2', 'border-neutral-3');
 
   return (
     <section className="flex flex-col items-center grow bg-[white] rounded-xl shadow-lg">
       <header className="flex justify-between items-center w-full p-6 border-b-2 border-neutral-3">
-        {ownPosts && <Button onClick={handleSetPostMode}>
+        {arrayName === 'ownPosts' && <Button onClick={handleSetPostMode}>
           {(addEditPostMode) ?
             <ReactIcon src={<MdArrowBack className="w-6 h-6" />} color="white" /> :
             <ReactIcon src={<MdAdd className="w-6 h-6" />} color="white" />}
@@ -101,14 +125,14 @@ function UserPosts({ ownPosts }) {
             title="Topics" options={TOPICS_LIST} />}
       </header>
 
-      {!addEditPostMode && <div className={allPostsClass}>
+      {!addEditPostMode && <div className={postsClass}>
         {content}
       </div>}
 
       {!!addEditPostMode && <PostEditor topics={blogTopics} onUpdate={getAllPosts} />}
 
       {!addEditPostMode && <footer className="flex justify-around items-center w-full p-4">
-        <p className="text-neutral-4">Number of posts: {userPosts.length}</p>
+        <p className="text-neutral-4">Number of posts: {userPosts[arrayName].length}</p>
         <p className="text-neutral-4">Number of reactions: {reactions}</p>
       </footer>}
     </section>
