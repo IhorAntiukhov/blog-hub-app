@@ -57,6 +57,7 @@ function PostEditor({ topics, onUpdate }) {
           content: postContent,
           topics,
           reactions: [],
+          marked: [],
           publishDate: new Date(),
           editDate: ''
         });

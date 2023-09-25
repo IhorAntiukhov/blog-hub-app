@@ -38,7 +38,14 @@ function UserPosts({ arrayName }) {
           });
           querySnapshot = await getDocs(query(collectionGroup(db, 'posts'), where('uid', 'in', subscribedUsers)));
         }
-      } else {
+      }
+      else if (arrayName === 'marked') {
+        querySnapshot = await getDocs(query(collectionGroup(db, 'posts'), where('marked', 'array-contains', auth.currentUser.uid)));
+        querySnapshot.forEach((doc) => {
+          if (doc.id === 'userData') usersData[doc.data().uid] = { ...doc.data() };
+        })
+      }
+      else {
         querySnapshot = await getDocs(collection(db, 'users', (arrayName === 'ownPosts') ? auth.currentUser.uid : userData.uid, 'posts'));
       }
 
@@ -82,20 +89,32 @@ function UserPosts({ arrayName }) {
 
   let content;
   if (userPosts[arrayName].length === 0) {
-    content = <p className="text-2xl text-neutral-4">
-      {(arrayName === 'ownPosts') ? 'You haven\'t published any posts' :
-        (arrayName === 'subscriptions') ? 'You haven\'t followed any user' : 'The user hasn\'t published any posts'}
-    </p>;
+    let noPostsText;
+    switch (arrayName) {
+      case 'ownPosts':
+        noPostsText = 'You haven\'t published any posts';
+        break;
+      case 'subscriptions':
+        noPostsText = 'You haven\'t followed any user';
+        break;
+      case 'marked':
+        noPostsText = 'You haven\'t marked any posts';
+        break;
+      default:
+        noPostsText = 'The user hasn\'t published any posts';
+        break;
+    }
+    content = <p className="text-2xl text-neutral-4">{noPostsText}</p>;
   } else if (userPosts[arrayName].length > 0 && sortedPosts.length === 0) {
     content = <p className="text-2xl text-neutral-4">There are no posts on established topics</p>;
   } else {
     content = sortedPosts.map((post) =>
     (<Post key={post.id} post={post} onUpdate={getAllPosts} onEdit={(topics) => {
       setBlogTopics(topics);
-    }} editButtons={arrayName === 'ownPosts'} showUserData={arrayName === 'subscriptions'} />
+    }} editButtons={arrayName === 'ownPosts'} showUserData={arrayName === 'subscriptions' || arrayName === 'marked'} />
     ));
 
-    content = (arrayName === 'subscriptions') ?
+    content = (arrayName === 'subscriptions' || arrayName === 'marked') ?
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-4">{content}</div> :
       content;
   }

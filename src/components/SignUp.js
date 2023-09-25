@@ -31,6 +31,7 @@ function SignUp() {
         creationTime,
         subscribers: [],
         subscriptions: [],
+        marked: [auth.currentUser.uid]
       });
     } catch (error) {
       dispatch(showNotification({

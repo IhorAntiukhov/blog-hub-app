@@ -36,12 +36,8 @@ function useSortPosts(userFilteringTopics, arrayName) {
     if (filterByPopularity === 'Popular') {
       sortedPosts.sort((a, b) => a.reactions.length - b.reactions.length);
     }
-    else if (filterByPopularity === 'Trending') {
-      sortedPosts = [...sortedPosts.filter((post) => {
-        const now = new Date();
-        return ((now.getTime() - post.publishDate.getTime()) < 604800000);
-      })]
-      sortedPosts.sort((a, b) => a.reactions.length - b.reactions.length);
+    else if (filterByPopularity === 'Marked') {
+      sortedPosts.sort((a, b) => a.marked.length - b.marked.length);
     }
     else {
       sortedPosts.sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());

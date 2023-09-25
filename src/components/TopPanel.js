@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
-import TOPICS_LIST from '..';
-import { addFilteringTopic, removeFilteringTopic, setFilterByPopularity } from '../store';
 import classNames from 'classnames';
+import { addFilteringTopic, removeFilteringTopic, setFilterByPopularity } from '../store';
+import TOPICS_LIST from '..';
 
 function TopPanel() {
   const { filterByPopularity, filteringTopics } = useSelector((state) => state.allPostsReducer);
   const dispatch = useDispatch();
 
-  const filterByPopularityOptions = ['Recent', 'Popular', 'Trending'];
+  const filterByPopularityOptions = ['Recent', 'Popular', 'Marked'];
 
   const filterByPopularityContent = filterByPopularityOptions.map((option) => {
     const optionClass = classNames('px-4', 'py-1.5', 'text-lg',

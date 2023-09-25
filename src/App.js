@@ -50,6 +50,9 @@ function App() {
         </Route>
 
         <Route path="/marked">
+          <div className="flex flex-col h-full p-6">
+            <UserPosts arrayName="marked" />
+          </div>
         </Route>
 
         <Route path="/profile">

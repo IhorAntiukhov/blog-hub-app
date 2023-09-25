@@ -3,7 +3,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { FaHeart } from 'react-icons/fa';
 import { doc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { BiSolidUser } from 'react-icons/bi';
+import { BiSolidBookmark, BiSolidUser } from 'react-icons/bi';
 import { openUserInfoPage, setAddEditPostMode, setCurrentPath, showNotification } from '../store';
 import { auth, db } from '../firebase-config';
 import MarkdownPreviewRef from '@uiw/react-markdown-preview';
@@ -49,6 +49,21 @@ function Post({ post, onUpdate, onEdit, showUserData, editButtons }) {
     }
   }
 
+  const markPost = async () => {
+    try {
+      await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', post.id), {
+        marked: (post.marked.indexOf(auth.currentUser.uid) === -1) ?
+          arrayUnion(auth.currentUser.uid) :
+          arrayRemove(auth.currentUser.uid)
+      });
+      onUpdate();
+    } catch (error) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Failed to mark post'
+      }));
+    }
+  }
+
   const openUserInfo = () => {
     if (auth.currentUser.uid === post.uid) {
       dispatch(setCurrentPath('/profile'));
@@ -64,7 +79,7 @@ function Post({ post, onUpdate, onEdit, showUserData, editButtons }) {
     return `${timeString} ${dateString}`
   }
 
-  const topics = post.topics.map((topic) => <p className="px-4 py-1.5 text-lg bg-neutral-1 rounded-xl">{topic}</p>);
+  const topics = post.topics.map((topic) => <p className="ml-2 mb-2 px-4 py-1.5 text-lg bg-neutral-1 rounded-xl">{topic}</p>);
 
   return (
     <div className="flex flex-col space-y-2 p-4 bg-neutral-2 rounded-lg shadow-md">
@@ -90,14 +105,23 @@ function Post({ post, onUpdate, onEdit, showUserData, editButtons }) {
 
       <MarkdownPreviewRef className="p-4" source={post.content} />
 
-      <div className="flex justify-between items-end grow">
-        <div className="flex items-center space-x-2">
-          <ReactIcon src={<FaHeart className="w-6 h-6 cursor-pointer duration-150 hover:opacity-75 active:scale-125" onClick={addReaction} />}
-            color={(post.reactions.includes(auth.currentUser?.uid) ? '#00A9BC' : '#73C67E')} />
-          <p className="text-2xl">{post.reactions.length}</p>
+      <div className="flex justify-between items-end grow space-x-2">
+        <div className="flex space-x-2">
+          <div className="flex items-center space-x-2">
+            <ReactIcon src={<FaHeart className="w-6 h-6 cursor-pointer duration-150 hover:opacity-75 active:scale-125" onClick={addReaction} />}
+              color={(post.reactions.includes(auth.currentUser?.uid) ? '#00A9BC' : '#73C67E')} />
+            <p className="text-2xl">{post.reactions.length}</p>
+          </div>
+
+          {!editButtons && auth.currentUser.uid !== post.uid && (
+            <div className="flex items-center space-x-2">
+              <ReactIcon src={<BiSolidBookmark className="w-[1.6rem] h-[1.6rem] cursor-pointer duration-150 hover:opacity-75 active:scale-125" onClick={markPost} />}
+                color={(post.marked.includes(auth.currentUser?.uid) ? '#00A9BC' : '#73C67E')} />
+              <p className="text-2xl">{post.marked.length}</p>
+            </div>)}
         </div>
 
-        <p className="flex flex-wrap space-x-2">{topics}</p>
+        <p className="flex justify-end flex-wrap -mb-2">{topics}</p>
       </div>
     </div>
   );
