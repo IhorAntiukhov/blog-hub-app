@@ -1,13 +1,13 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentPath } from './store';
-import Sidebar from './components/Sidebar';
-import Route from './components/Route';
-import UserProfilePage from './pages/UserProfilePage';
-import NotificationBar from './components/NotificationBar';
 import HomePage from './pages/HomePage';
 import UserInfoPage from './pages/UserInfoPage';
-import UserPosts from './components/UserPosts';
+import UserProfilePage from './pages/UserProfilePage';
+import Sidebar from './components/navigation/Sidebar';
+import Route from './components/navigation/Route';
+import NotificationBar from './components/notifications/NotificationBar';
+import UserPosts from './components/posts/UserPosts';
 
 function App() {
   const dispatch = useDispatch();
@@ -34,9 +34,9 @@ function App() {
   if (currentPath === '/user-info' && !userData) dispatch(setCurrentPath('/'));
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-1">
+    <div className="flex h-screen overflow-hidden bg-neutral-1 sm:grid sm:grid-cols-[1fr] sm:grid-rows-[1fr,_auto]">
       <Sidebar />
-      <main className="relative grow">
+      <main className="relative grow sm:overflow-auto">
         <NotificationBar />
 
         <Route path="/">
@@ -44,13 +44,13 @@ function App() {
         </Route>
 
         <Route path="/subscriptions">
-          <div className="flex flex-col h-full p-6">
+          <div className="flex items-stretch h-full p-6">
             <UserPosts arrayName="subscriptions" />
           </div>
         </Route>
 
         <Route path="/marked">
-          <div className="flex flex-col h-full p-6">
+          <div className="flex items-stretch h-full p-6">
             <UserPosts arrayName="marked" />
           </div>
         </Route>

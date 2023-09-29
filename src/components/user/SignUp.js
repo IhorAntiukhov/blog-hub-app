@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock } from 'react-icons/md';
 import { HiUserAdd } from 'react-icons/hi';
-import { setDoc, doc } from 'firebase/firestore';
-import { setSignInOrSignUp, showNotification } from '../store';
-import { auth, db } from '../firebase-config';
-import ReactIcon from './ReactIcon';
-import Input from './Input';
-import Button from './Button';
+import { setSignInOrSignUp, showNotification } from '../../store';
+import { auth, db } from '../../firebase-config';
+import ReactIcon from '../other/ReactIcon';
+import Input from '../input/Input';
+import Button from '../other/Button';
 
 function SignUp() {
   const [userEmail, setUserEmail] = useState('');
@@ -31,7 +31,8 @@ function SignUp() {
         creationTime,
         subscribers: [],
         subscriptions: [],
-        marked: [auth.currentUser.uid]
+        marked: '',
+        header: ''
       });
     } catch (error) {
       dispatch(showNotification({
@@ -79,6 +80,7 @@ function SignUp() {
       await createUserWithEmailAndPassword(auth, userEmail, userPassword);
       await setUserData();
 
+      dispatch(setSignInOrSignUp('signIn'));
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: 'Successfully created a user'
       }));
@@ -95,14 +97,14 @@ function SignUp() {
         <ReactIcon src={<BiSolidUserRectangle className="w-28 h-28 mb-4" />} color="" />
 
         <div className="w-full mb-4">
-          <Input value={userEmail} onChange={(text) => { setUserEmail(text) }}
+          <Input value={userEmail} onChange={(text) => { setUserEmail(text) }} onSubmit={signUp}
             type="text" placeholder="User email" icon={<MdEmail className="h-8 w-8" />} />
         </div>
 
         <div className="flex flex-col space-y-2 mb-4">
-          <Input value={userPassword} onChange={(text) => { setUserPassword(text) }}
+          <Input value={userPassword} onChange={(text) => { setUserPassword(text) }} onSubmit={signUp}
             type="password" placeholder="User password" icon={<MdLock className="h-8 w-8" />} />
-          <Input value={confirmedUserPassword} onChange={(text) => { setConfirmedUserPassword(text) }}
+          <Input value={confirmedUserPassword} onChange={(text) => { setConfirmedUserPassword(text) }} onSubmit={signUp}
             type="password" placeholder="Confirm password" icon={<MdLock className="h-8 w-8" />} />
         </div>
 

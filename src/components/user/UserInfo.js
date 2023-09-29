@@ -4,22 +4,29 @@ import { updateDoc, doc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { BiSolidUser, BiSolidCalendar } from 'react-icons/bi';
 import { HiUserAdd } from 'react-icons/hi';
 import { MdPersonRemove } from 'react-icons/md';
-import { addSubscriber, removeSubscriber, showNotification } from '../store';
-import { db, auth } from '../firebase-config';
-import ReactIcon from './ReactIcon';
-import Button from './Button';
+import { addSubscriber, removeSubscriber, showNotification } from '../../store';
+import { db, auth } from '../../firebase-config';
+import ReactIcon from '../other/ReactIcon';
+import Button from '../other/Button';
 
 function UserInfo() {
   const { userData } = useSelector((state) => state.navigationReducer);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const subscribe = async () => {
+    if (!auth.currentUser) {
+      dispatch(showNotification({
+        id: nanoid(), type: 'Error', text: 'Log in to subscribe'
+      }));
+
+      return;
+    }
+
     try {
       if (userData.subscribers.indexOf(auth.currentUser.uid) === -1) {
         await updateDoc(doc(db, 'users', userData.uid, 'posts', 'userData'), {
           subscribers: arrayUnion(auth.currentUser.uid)
         });
-
         await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
           subscriptions: arrayUnion(userData.uid)
         });
@@ -29,7 +36,6 @@ function UserInfo() {
         await updateDoc(doc(db, 'users', userData.uid, 'posts', 'userData'), {
           subscribers: arrayRemove(auth.currentUser.uid)
         });
-
         await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', 'userData'), {
           subscriptions: arrayRemove(userData.uid)
         });
@@ -44,14 +50,15 @@ function UserInfo() {
   }
 
   const formatDate = (date) => {
-    const dateString = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
-    const timeString = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    const newDate = new Date(date);
+    const dateString = `${String(newDate.getDate()).padStart(2, '0')}.${String(newDate.getMonth() + 1).padStart(2, '0')}.${newDate.getFullYear()}`;
+    const timeString = `${String(newDate.getHours()).padStart(2, '0')}:${String(newDate.getMinutes()).padStart(2, '0')}`;
 
     return `${timeString} ${dateString}`
-  }
+  };
 
   return (
-    <div className="flex flex-col items-center self-start space-y-2 p-6 bg-[white] rounded-xl shadow-lg">
+    <div className="flex flex-col items-center self-start space-y-2 p-6 bg-[white] rounded-xl shadow-lg lg:self-center">
       {(userData.photoURL) ?
         <img className="w-36 h-36 rounded-full object-cover" src={userData.photoURL} alt="User logo" /> :
         <ReactIcon src={<BiSolidUser className="w-36 h-36 -mb-2" />} color="" />}
@@ -62,15 +69,15 @@ function UserInfo() {
 
       <div className="flex items-center space-x-2">
         <ReactIcon src={<BiSolidCalendar className="w-8 h-8" />} />
-        <p>Joined {formatDate(userData.creationTime.toDate())}</p>
+        <p className="whitespace-nowrap">Joined {formatDate(userData.creationTime)}</p>
       </div>
 
       <div className="w-full pt-2">
         <Button className="w-full bg-primary hover:bg-primarySaturated" onClick={subscribe}>
-          <ReactIcon src={(userData.subscribers.indexOf(auth.currentUser.uid) === -1) ?
+          <ReactIcon src={(userData.subscribers.indexOf(auth.currentUser?.uid) === -1) ?
             <HiUserAdd className="w-6 h-6" /> :
             <MdPersonRemove className="w-6 h-6" />} color="white" />
-          <span>{(userData.subscribers.indexOf(auth.currentUser.uid) === -1) ? 'Subscribe' : 'Unsubscribe'}</span>
+          <span>{(userData.subscribers.indexOf(auth.currentUser?.uid) === -1) ? 'Subscribe' : 'Unsubscribe'}</span>
         </Button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { BiSolidUpArrow, BiSolidDownArrow } from 'react-icons/bi';
-import { setSort } from '../store';
-import ReactIcon from './ReactIcon';
+import { setSort } from '../../store';
+import ReactIcon from '../other/ReactIcon';
 
 function SortCriteria({ title }) {
   const { sortCriteria, sortOrder } = useSelector((state) => state.userPostsReducer);
@@ -23,7 +23,7 @@ function SortCriteria({ title }) {
 
   return (
     <div className="flex items-center space-x-3">
-      <p className="text-xl">{title}</p>
+      <p className="text-xl 2xl:text-lg">{title}</p>
       <div className="flex flex-col justify-center space-y-1">
         <ReactIcon src={
           <BiSolidUpArrow className="w-4 h-4 cursor-pointer duration-150 hover:opacity-60" onClick={setAscendingOrder} />

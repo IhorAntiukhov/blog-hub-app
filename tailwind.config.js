@@ -29,8 +29,17 @@ module.exports = {
     },
     animation: {
       'shift-right': 'shiftRight 0.3s linear 1, shiftLeft 0.3s linear 3.7s 1 normal forwards',
+      'shift-down': 'shiftDown 0.3s linear 1, shiftUp 0.3s linear 9.7s 1 normal forwards',
       'open-dropdown': 'openDropdown 0.3s linear 1 forwards',
       'close-dropdown': 'closeDropdown 0.3s linear 1 forwards'
+    },
+    screens: {
+      '2xl': { 'max': '1530px' },
+      'xl': { 'max': '1415px', 'min': '1176px' },
+      'lg': { 'max': '1175px' },
+      'md': { 'max': '955px' },
+      'sm': { 'max': '740px' },
+      'xs': { 'max': '655px' }
     },
     extend: {
       keyframes: {
@@ -41,6 +50,14 @@ module.exports = {
         shiftLeft: {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-120%)' }
+        },
+        shiftDown: {
+          '0%': { transform: 'translateY(-120%)' },
+          '100%': { transform: 'translateY(0)' }
+        },
+        shiftUp: {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(-120%)' }
         },
         openDropdown: {
           '0%': { transform: 'scaleY(0%)' },

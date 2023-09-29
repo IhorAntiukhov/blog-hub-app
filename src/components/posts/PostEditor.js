@@ -3,18 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { MdPreview, MdClear, MdArrowBack, MdPublish, MdSave } from 'react-icons/md';
-import { setAddEditPostMode, showNotification } from '../store';
-import { auth, db } from '../firebase-config';
+import { addPost, setPostContent, showNotification, updatePost } from '../../store';
+import { auth, db } from '../../firebase-config';
 import MarkdownPreviewRef from '@uiw/react-markdown-preview';
-import Button from './Button';
-import Input from './Input';
-import ReactIcon from './ReactIcon';
+import Button from '../other/Button';
+import Input from '../input/Input';
+import ReactIcon from '../other/ReactIcon';
 
-function PostEditor({ topics, onUpdate }) {
-  const editablePostData = useSelector((state) => state.userPostsReducer.editablePostData);
+function PostEditor({ topics }) {
+  const { editablePostData, postContent } = useSelector((state) => state.userPostsReducer);
 
   const [postTitle, setPostTitle] = useState(editablePostData?.header || '');
-  const [postContent, setPostContent] = useState(editablePostData?.content || '');
   const [previewMode, setPreviewMode] = useState(false);
 
   const dispatch = useDispatch();
@@ -28,22 +27,23 @@ function PostEditor({ topics, onUpdate }) {
       return;
     }
 
+    const now = new Date();
+
     if (editablePostData) {
       try {
-        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', editablePostData.id), {
+        const post = {
           header: postTitle,
           content: postContent,
           topics,
-          editDate: new Date()
-        });
+          editDate: now.getTime()
+        };
+
+        await updateDoc(doc(db, 'users', auth.currentUser.uid, 'posts', editablePostData.id), { ...post, editDate: now });
 
         dispatch(showNotification({
           id: nanoid(), type: 'Info', text: 'Post successfully updated'
         }));
-        dispatch(setAddEditPostMode({
-          addEditPostMode: 0
-        }));
-        onUpdate();
+        dispatch(updatePost(post));
       } catch (error) {
         dispatch(showNotification({
           id: nanoid(), type: 'Error', text: 'Failed to update post'
@@ -51,21 +51,23 @@ function PostEditor({ topics, onUpdate }) {
       }
     } else {
       try {
-        await addDoc(collection(db, 'users', auth.currentUser.uid, 'posts'), {
+        const post = {
           uid: auth.currentUser.uid,
           header: postTitle,
           content: postContent,
           topics,
           reactions: [],
           marked: [],
-          publishDate: new Date(),
+          publishDate: now.getTime(),
           editDate: ''
-        });
+        };
+
+        await addDoc(collection(db, 'users', auth.currentUser.uid, 'posts'), { ...post, publishDate: now });
 
         dispatch(showNotification({
           id: nanoid(), type: 'Info', text: 'Post successfully published'
         }));
-        onUpdate();
+        dispatch(addPost(post));
       } catch (error) {
         dispatch(showNotification({
           id: nanoid(), type: 'Error', text: 'Failed to publish post'
@@ -87,18 +89,22 @@ function PostEditor({ topics, onUpdate }) {
   }
 
   const handleInput = (text) => {
-    setPostContent(text);
+    dispatch(setPostContent(text));
+  }
+
+  const clearContent = () => {
+    dispatch(showNotification({
+      id: nanoid(), type: 'Confirm', text: 'Clear post content?'
+    }));
   }
 
   return (
-    <div className="flex flex-col space-y-4 grow w-full p-6 border-b-2 border-neutral-3">
+    <div className="flex flex-col space-y-4 grow w-full p-6 border-b-2 border-neutral-3 overflow-auto">
       {(previewMode) ?
         <MarkdownPreviewRef className="grow border-b-2 border-neutral-3" source={postContent} /> :
-        <>
-          <Input value={postTitle} onChange={(text) => { setPostTitle(text) }} type="text" placeholder="Post title" largeFont />
+        <><Input value={postTitle} onChange={(text) => { setPostTitle(text) }} type="text" placeholder="Post title" largeFont />
           <textarea className="grow p-4 text-xl border-[3px] border-neutral-3 rounded-lg focus:outline-none"
-            placeholder="Enter Markdown text ..." value={postContent} onInput={(event) => { handleInput(event.target.value) }} />
-        </>}
+            placeholder="Enter Markdown text ..." value={postContent} onInput={(event) => { handleInput(event.target.value) }} /></>}
 
       <div className="flex justify-end space-x-4">
         <Button onClick={openPreviewMode} secondary>
@@ -115,7 +121,7 @@ function PostEditor({ topics, onUpdate }) {
               <ReactIcon src={<MdPublish className="w-6 h-6" />} color="white" />}
             <span>{(editablePostData) ? 'Save changes' : 'Publish post'}</span>
           </Button> :
-          <Button onClick={() => { setPostContent('') }} error>
+          <Button onClick={clearContent} error>
             <ReactIcon src={<MdClear className="w-6 h-6" />} color="white" />
             <span>Clear</span>
           </Button>}

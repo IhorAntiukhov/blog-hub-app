@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { nanoid } from '@reduxjs/toolkit';
 import {
   getAdditionalUserInfo,
   sendPasswordResetEmail,
@@ -7,15 +8,14 @@ import {
   signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { setSignInOrSignUp, showNotification } from '../store';
+import { setSignInOrSignUp, showNotification } from '../../store';
+import { db, auth, googleProvider } from '../../firebase-config';
 import { BiSolidUserRectangle } from 'react-icons/bi';
 import { MdEmail, MdLock, MdLogin } from 'react-icons/md';
-import { db, auth, googleProvider } from '../firebase-config';
-import ReactIcon from './ReactIcon';
-import Input from './Input';
-import Button from './Button';
-import google from '../svg/google.svg';
-import { nanoid } from '@reduxjs/toolkit';
+import ReactIcon from '../other/ReactIcon';
+import Input from '../input/Input';
+import Button from '../other/Button';
+import google from '../../svg/google.svg';
 
 function SignIn() {
   const [userEmail, setUserEmail] = useState('');
@@ -34,6 +34,7 @@ function SignIn() {
 
     try {
       await sendPasswordResetEmail(auth, userEmail);
+
       dispatch(showNotification({
         id: nanoid(), type: 'Info', text: `Reset email sent to ${userEmail}`
       }));
@@ -55,7 +56,8 @@ function SignIn() {
         creationTime,
         subscribers: [],
         subscriptions: [],
-        marked: [auth.currentUser.uid]
+        marked: '',
+        header: ''
       });
     } catch (error) {
       dispatch(showNotification({
@@ -107,9 +109,9 @@ function SignIn() {
         <ReactIcon src={<BiSolidUserRectangle className="w-28 h-28 mb-4" />} color="" />
 
         <div className="flex flex-col space-y-2 mb-4">
-          <Input value={userEmail} onChange={(text) => { setUserEmail(text) }}
+          <Input value={userEmail} onChange={(text) => { setUserEmail(text) }} onSubmit={signInWithEmail}
             type="text" placeholder="User email" icon={<MdEmail className="h-8 w-8" />} />
-          <Input value={userPassword} onChange={(text) => { setUserPassword(text) }}
+          <Input value={userPassword} onChange={(text) => { setUserPassword(text) }} onSubmit={signInWithEmail}
             type="password" placeholder="User password" icon={<MdLock className="h-8 w-8" />} />
 
           <p className="self-end text-lg cursor-pointer" onClick={resetPassword}>Forgot password?</p>

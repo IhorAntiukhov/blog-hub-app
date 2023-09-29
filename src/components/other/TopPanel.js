@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
-import { addFilteringTopic, removeFilteringTopic, setFilterByPopularity } from '../store';
-import TOPICS_LIST from '..';
+import { addFilteringTopic, removeFilteringTopic, setFilterByPopularity } from '../../store';
+import TOPICS_LIST from '../..';
 
 function TopPanel() {
   const { filterByPopularity, filteringTopics } = useSelector((state) => state.allPostsReducer);
@@ -42,12 +42,12 @@ function TopPanel() {
   });
 
   return (
-    <div className="flex justify-center space-x-4">
-      <div className="flex space-x-2 pr-4 border-r-2 border-r-neutral-3">
+    <div className="flex flex-wrap justify-center space-x-4 lg:space-x-0 lg:gap-2">
+      <div className="flex space-x-2 pr-4 border-r-2 border-r-neutral-3 lg:border-r-0">
         {filterByPopularityContent}
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex flex-wrap gap-2">
         {filterByTopicsContent}
       </div>
     </div>

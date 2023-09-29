@@ -1,12 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import {
-  navigationReducer, setCurrentPath, setSignInOrSignUp, openUserInfoPage, addSubscriber, removeSubscriber, showNotification, hideNotification
+  navigationReducer, setCurrentPath, setSignInOrSignUp, openUserInfoPage,
+  addSubscriber, removeSubscriber, showNotification, hideNotification
 } from './slices/navigationSlice';
 import {
-  userPostsReducer, setUserPosts, setAddEditPostMode, setSort
+  userPostsReducer, setUserPosts, toggleReactionToUserPost, toggleUserPostMark,
+  addPost, updatePost, deletePost, setAddEditPostMode, setPostContent, setSort
 } from './slices/userPostsSlice';
 import {
-  allPostsReducer, setAllPosts, setFilterByPopularity, addFilteringTopic, removeFilteringTopic
+  allPostsReducer, setAllPosts, toggleReactionToPost, togglePostMark,
+  setSearchTerm, setFilterByPopularity, addFilteringTopic, removeFilteringTopic
 } from './slices/allPostsSlice';
 
 const store = configureStore({
@@ -19,6 +22,6 @@ const store = configureStore({
 
 export {
   store, setCurrentPath, setSignInOrSignUp, openUserInfoPage, addSubscriber, removeSubscriber, showNotification, hideNotification,
-  setUserPosts, setAddEditPostMode, setSort,
-  setAllPosts, setFilterByPopularity, addFilteringTopic, removeFilteringTopic
+  setUserPosts, toggleReactionToUserPost, toggleUserPostMark, addPost, updatePost, deletePost, setAddEditPostMode, setPostContent, setSort,
+  setAllPosts, toggleReactionToPost, togglePostMark, setSearchTerm, setFilterByPopularity, addFilteringTopic, removeFilteringTopic
 };
