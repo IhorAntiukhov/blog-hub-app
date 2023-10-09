@@ -24,10 +24,10 @@ input[type="checkbox"]:checked + label::before {
 
 ::-webkit-scrollbar-thumb {
   width: 10px;
-  background-color: #d9d9c3;
+  background-color: #d9d9cc;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #bfbfac;
+  background-color: #bfbfb4;
 }

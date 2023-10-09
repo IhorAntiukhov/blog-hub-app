@@ -14,14 +14,14 @@ module.exports = {
       secondarySaturated: '#96d49e',
       accent: '#00A9BC',
       neutral: {
-        1: '#ffffe6',
-        2: '#f7f7df',
-        3: '#e6e6cf',
-        4: '#808077'
+        1: '#ffffed',
+        2: '#f7f7e9',
+        3: '#e6e6da',
+        4: '#808079'
       },
       neutralSaturated: {
-        1: '#f0f0d8',
-        2: '#a0a093',
+        1: '#f0f0e1',
+        2: '#a1a19c',
       },
       info: '#127be3',
       error: '#e32e12',
