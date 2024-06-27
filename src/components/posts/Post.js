@@ -97,7 +97,7 @@ function Post({ arrayName, onToggleReaction, onTogglePostMark, onEdit, post, sho
   const openUserInfo = () => {
     if (auth.currentUser?.uid === post.uid) {
       dispatch(setCurrentPath('/profile'));
-    } else {
+    } else if (post.userData) {
       dispatch(openUserInfoPage(post.userData));
     }
   }
@@ -121,10 +121,10 @@ function Post({ arrayName, onToggleReaction, onTogglePostMark, onEdit, post, sho
     <div className="flex flex-col space-y-2 p-4 bg-neutral-2 rounded-lg shadow-md">
       <div className="flex flex-wrap justify-between items-center gap-2">
         {showUserData && <div className="flex items-center space-x-4 cursor-pointer" onClick={openUserInfo}>
-          {(post.userData.photoURL) ?
+          {(post.userData?.photoURL) ?
             <img className="w-16 h-16 rounded-full object-cover" src={post.userData.photoURL} alt="User logo" /> :
             <ReactIcon src={<BiSolidUser className="w-16 h-16" />} color="" />}
-          <p className="text-2xl">{post.userData.name || 'Anonymous'}</p>
+          <p className="text-2xl">{post.userData?.name || 'Anonymous'}</p>
         </div>}
 
         <p className="break-words">{formatDate(post.publishDate)}{post.editDate && ` (edited ${formatDate(post.editDate)})`}</p>
